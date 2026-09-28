@@ -1,0 +1,17 @@
+[Unit]
+Description=SunMail Inbound Mail & Retry Worker Daemon
+After=network.target postfix.service
+
+[Service]
+Type=simple
+User=sunmail
+Group=sunmail
+WorkingDirectory=/opt/sunmail/apps/mail-server
+ExecStart=/usr/bin/node /opt/sunmail/apps/mail-server/dist/index.js
+Restart=always
+RestartSec=5s
+EnvironmentFile=/etc/sunmail/.env
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target

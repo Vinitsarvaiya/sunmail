@@ -1,0 +1,10 @@
+# ==============================================================================
+# SunMail Postfix master.cf (Transport mapping to SunMail Node.js processor)
+# ==============================================================================
+
+# Standard SMTP Inbound (Port 25)
+smtp      inet  n       -       y       -       -       smtpd
+
+# SunMail Custom Pipe Transport
+sunmail   unix  -       n       n       -       -       pipe
+  flags=F user=sunmail argv=/usr/bin/node /opt/sunmail/apps/mail-server/dist/pipe.js ${sender} ${recipient}

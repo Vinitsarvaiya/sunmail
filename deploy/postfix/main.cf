@@ -1,0 +1,38 @@
+# ==============================================================================
+# SunMail Postfix main.cf Configuration (Port 25 Inbound Receiving)
+# ==============================================================================
+
+myhostname = mail.sunmail.com
+mydomain = sunmail.com
+myorigin = $mydomain
+inet_interfaces = all
+inet_protocols = ipv4
+
+# Banner
+smtpd_banner = $myhostname ESMTP SunMail Inbound Receiver
+
+# Accept mail for domains passed to transport
+mydestination = localhost, $myhostname
+
+# SunMail pipe transport for all other domains
+transport_maps = hash:/etc/postfix/transport
+virtual_alias_maps = hash:/etc/postfix/virtual
+
+# Security & Anti-Abuse (Do NOT act as open relay)
+smtpd_recipient_restrictions =
+    permit_mynetworks,
+    reject_unauth_destination,
+    reject_invalid_helo_hostname,
+    reject_non_fqdn_helo_hostname,
+    reject_non_fqdn_sender,
+    reject_non_fqdn_recipient
+
+# Max message size (25MB)
+message_size_limit = 26214400
+
+# TLS Configuration
+smtpd_tls_security_level = may
+smtpd_tls_cert_file = /etc/letsencrypt/live/mail.sunmail.com/fullchain.pem
+smtpd_tls_key_file = /etc/letsencrypt/live/mail.sunmail.com/privkey.pem
+smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1, !TLSv1.1
+smtpd_tls_mandatory_ciphers = medium

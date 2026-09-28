@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # SunMail Web Frontend Dashboard (Next.js)
+  web:
+    build:
+      context: ..
+      dockerfile: ./apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+      - SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+      - SMTP_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    restart: unless-stopped
+
+  # SunMail Inbound SMTP Daemon & Forwarding Processor
+  mail-server:
+    build:
+      context: ..
+      dockerfile: ./apps/mail-server/Dockerfile
+    ports:
+      - "2525:2525"
+    environment:
+      - SUPABASE_URL=https://your-project.supabase.co
+      - SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+      - SMTP_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - MAIL_HOST=mail.sunmail.com
+      - SMTP_PORT=2525
+    restart: unless-stopped
+
+  # Mailpit: Mock Destination Customer SMTP Server (for local testing of email forwarding)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: sunmail-mock-destination-smtp
+    ports:
+      - "1025:1025" # Mock SMTP Inbound (Port for SunMail destination routing)
+      - "8025:8025" # Mock Web UI (Visit http://localhost:8025 to see forwarded emails)
+    restart: unless-stopped
