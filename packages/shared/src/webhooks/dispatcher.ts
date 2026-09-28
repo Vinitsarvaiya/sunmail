@@ -40,7 +40,7 @@ export async function dispatchWebhook(
       headers: {
         'Content-Type': 'application/json',
         'User-Agent': 'SunMail-Webhook-Dispatcher/1.0',
-        'X-SunMail-Signature': signature,
+        'X-SunMail-Signature': `sha256=${signature}`,
         'X-SunMail-Timestamp': timestamp,
         'X-SunMail-Event': payload.event,
       },

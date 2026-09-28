@@ -19,9 +19,7 @@ export const config = {
 };
 
 export function getSupabaseAdmin() {
-  if (!config.supabaseServiceKey) {
-    console.warn('[SunMail] SUPABASE_SERVICE_ROLE_KEY is not set. Database operations may fail RLS policies.');
-  }
+  validateServiceKey(config.supabaseServiceKey);
 
   return createClient(config.supabaseUrl, config.supabaseServiceKey, {
     auth: {
@@ -30,3 +28,22 @@ export function getSupabaseAdmin() {
     },
   });
 }
+
+export function validateServiceKey(key: string): 'secret' | 'service_role' {
+  if (key.startsWith('sb_secret_')) return 'secret';
+
+  let role: unknown;
+  try {
+    role = JSON.parse(Buffer.from(key.split('.')[1] || '', 'base64url').toString()).role;
+  } catch {
+    // Report the configuration problem without exposing credentials.
+  }
+  if (role === 'service_role') return 'service_role';
+
+  throw new Error(
+    'SUPABASE_SERVICE_ROLE_KEY must be a Supabase server secret or service_role key, not a public/anon key. ' +
+    'Check the launching terminal environment and .env, then restart the mail worker.'
+  );
+}
+
+console.log(`[SunMail] Supabase credential type: ${validateServiceKey(config.supabaseServiceKey)}`);
