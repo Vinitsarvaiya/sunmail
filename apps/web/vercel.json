@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd ../.. && pnpm install --no-frozen-lockfile && pnpm --filter @sunmail/shared build && pnpm --filter @sunmail/web build",
+  "installCommand": "cd ../.. && pnpm install --no-frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm --filter @sunmail/shared build && pnpm --filter @sunmail/web build",
   "outputDirectory": ".next",
-  "installCommand": "echo 'install handled in buildCommand'",
   "framework": "nextjs"
 }
